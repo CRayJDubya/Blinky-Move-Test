@@ -7,18 +7,10 @@
 
 package frc.robot;
 
-import javax.swing.plaf.basic.BasicButtonUI;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.buttons.Button;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,29 +20,30 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 
-  // Motors
- /* private final Talon frontLeftMotor = new Talon(0);
-  private final Talon backLeftMotor = new Talon(1);
-  private final Talon frontRightMotor = new Talon(2);
-  private final Talon backRightMotor = new Talon(3);
-  private SpeedController m_motor; */
-  
-  // Motor Grouping
-  //private final SpeedControllerGroup leftMotorGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
-  //private final SpeedControllerGroup rightMotorGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
+  // Creates a stick variable
+  private Joystick stick;   
+  // These create motor groups
+  private SpeedControllerGroup leftMotorGroup;
+  private SpeedControllerGroup rightMotorGroup;
+  // Required to use tankDrive/arcadeDrive
+  private DifferentialDrive robotDrive;
 
-  // Differential Drive
-  // private final DifferentialDrive m_robotDrive = new DifferentialDrive(leftMotorGroup, rightMotorGroup);
-  private Joystick stick;    // = new Joystick(1);
-  private SpeedController m_motor;
-  //Button motorRun = new JoystickButton(stick, 1);
-  //stick = new Joystick(1);
 
   @Override
   public void robotInit() {
-    m_motor = new Spark(0);
+    // Creates motors. Numbers in parantheses are where they are on the PWM.
+    final Spark frontLeftMotor = new Spark(0);
+    final Spark backLeftMotor = new Spark(1);
+    final Spark frontRightMotor = new Spark(2);
+    final Spark backRightMotor = new Spark(3);
+    // Groups motors
+    leftMotorGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
+    rightMotorGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
+    // DifferentialDrive groups the motor groups so they work with differential drive
+    robotDrive = new DifferentialDrive(leftMotorGroup, rightMotorGroup);
+    // The port that the joystick is plugged into on the computer
     stick = new Joystick(1);
-  }
+  } 
 
   @Override
   public void teleopPeriodic() {
@@ -58,9 +51,9 @@ public class Robot extends TimedRobot {
     // That means that the Y axis drives forward
     // and backward, and the X turns left and right.
     // m_robotDrive.tankDrive(stick.getY(), stick.getX());
-    //motorRun.whenPressed(command);
-    //frontLeftMotor.setSpeed(stick.getY());
-    m_motor.set(stick.getY());
+
+    //This creates the drive, putting * -1.0 means that forwards is forwards on our joystick.
+    robotDrive.arcadeDrive(stick.getY() * -1.0, stick.getX());
     SmartDashboard.putNumber("Joy stick Y", stick.getY());
   }
 }
